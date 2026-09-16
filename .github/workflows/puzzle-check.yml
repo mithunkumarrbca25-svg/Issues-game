@@ -61,7 +61,7 @@ jobs:
         run: |
           if [ "${{ steps.answer.outputs.answer }}" != "$(echo '${{ secrets.LEVEL2_ANSWER }}' | tr '[:upper:]' '[:lower:]')" ]; then
             echo "❌ Incorrect answer!"
-            exit 1
+            exit 2
           fi
           echo "✅ Level 2 correct!"
 
@@ -70,7 +70,7 @@ jobs:
         run: |
           if [ "${{ steps.answer.outputs.answer }}" != "$(echo '${{ secrets.LEVEL3_ANSWER }}' | tr '[:upper:]' '[:lower:]')" ]; then
             echo "❌ Incorrect answer!"
-            exit 1
+            exit 3
           fi
           echo "✅ Level 3 correct!"
 

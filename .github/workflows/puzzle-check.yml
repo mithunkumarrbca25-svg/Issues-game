@@ -43,12 +43,12 @@ jobs:
           elif echo "$TITLE" | grep -qi "level 3"; then
             echo "level=3" >> "$GITHUB_OUTPUT"
           else
-            echo "❌ PR title must contain Level 1, Level 2 or Level 3"
+            echo "level=skip" >> "$GITHUB_OUTPUT"
             exit 1
           fi
 
       - name: Check Level 1
-        if: steps.level.outputs.level == '1'
+        if: steps.level.outputs.level!='skip' && steps.level.outputs.level=='1'
         run: |
           if [ "${{ steps.answer.outputs.answer }}" != "$(echo '${{ secrets.LEVEL1_ANSWER }}' | tr '[:upper:]' '[:lower:]')" ]; then
             echo "❌ Incorrect answer!"
@@ -57,7 +57,7 @@ jobs:
           echo "✅ Level 1 correct!"
 
       - name: Check Level 2
-        if: steps.level.outputs.level == '2'
+        if: steps.level.outputs.level!='skip' && steps.level.outputs.level=='2'
         run: |
           if [ "${{ steps.answer.outputs.answer }}" != "$(echo '${{ secrets.LEVEL2_ANSWER }}' | tr '[:upper:]' '[:lower:]')" ]; then
             echo "❌ Incorrect answer!"
@@ -66,7 +66,7 @@ jobs:
           echo "✅ Level 2 correct!"
 
       - name: Check Level 3
-        if: steps.level.outputs.level == '3'
+         if: steps.level.outputs.level!='skip' && steps.level.outputs.level=='3'
         run: |
           if [ "${{ steps.answer.outputs.answer }}" != "$(echo '${{ secrets.LEVEL3_ANSWER }}' | tr '[:upper:]' '[:lower:]')" ]; then
             echo "❌ Incorrect answer!"

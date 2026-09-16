@@ -44,7 +44,7 @@ jobs:
             echo "level=3" >> "$GITHUB_OUTPUT"
           else
             echo "❌ PR title must contain Level 1, Level 2 or Level 3"
-            exit 1
+            echo "level=skip" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Check Level 1

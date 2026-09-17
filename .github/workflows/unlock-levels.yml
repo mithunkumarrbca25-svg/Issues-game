@@ -1,0 +1,81 @@
+name: Unlock Next Puzzle
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  unlock:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Check which level was completed
+        id: level
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+
+          if echo "$TITLE" | grep -qi "level 1"; then
+            echo "level=1" >> "$GITHUB_OUTPUT"
+          elif echo "$TITLE" | grep -qi "level 2"; then
+            echo "level=2" >> "$GITHUB_OUTPUT"
+          elif echo "$TITLE" | grep -qi "level 3"; then
+            echo "level=3" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Unlock Level 2
+        if: steps.level.outputs.level == '1'
+        run: |
+          gh issue edit 2 \
+            --remove-label "locked" \
+            --add-label "unlocked"
+
+          gh issue close 1
+
+          gh issue comment 2 \
+            --body "🎉 **LEVEL 2 UNLOCKED!**
+
+          Congratulations! You successfully completed Level 1.
+
+          🔓 Level 2 is now open. Good luck with the Broken Image puzzle!"
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Unlock Level 3
+        if: steps.level.outputs.level == '2'
+        run: |
+          gh issue edit 3 \
+            --remove-label "locked" \
+            --add-label "unlocked"
+
+          gh issue close 2
+
+          gh issue comment 3 \
+            --body "🎉 **LEVEL 3 UNLOCKED!**
+
+          Congratulations! You successfully completed Level 2.
+
+          🏆 The final mystery awaits!"
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Complete challenge
+        if: steps.level.outputs.level == '3'
+        run: |
+          gh issue close 3
+
+          gh issue comment 3 \
+            --body "🏆 **CHALLENGE COMPLETED!**
+
+          Congratulations! You solved all three levels! 🎉"
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -8,7 +8,7 @@ One statement below is false. Your task is to identify it and provide the reques
 
 1. This repository is public.
 2. The event uses GitHub Issues as the main answer-submission channel.
-3. The event controller is implemented with GitHub Actions.
+3. The event controller is implemented with GitHub Pages.
 4. The event has three games.
 5. Game 3 requires a participant to create a file named `final-answer.txt`.
 

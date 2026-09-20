@@ -26,8 +26,13 @@ jobs:
             const body = context.payload.comment.body.trim();
             const author = context.payload.comment.user.login;
 
+            const gameIssues = { 1: 4, 2: 5, 3: 6 };
+            const issueToGame = { 4: 1, 5: 2, 6: 3 };
+
             if (!body.toLowerCase().startsWith('/answer ')) return;
-            if (![1, 2, 3].includes(issue.number)) return;
+            if (!issueToGame[issue.number]) return;
+
+            const game = issueToGame[issue.number];
 
             async function comments(number) {
               return await github.paginate(github.rest.issues.listComments, {
@@ -38,9 +43,9 @@ jobs:
               });
             }
 
-            async function hasPass(game, user) {
-              const marker = '<!-- ISSUES-GAME-PASS game=' + game + ' user=' + user + ' -->';
-              return (await comments(game)).some(c => c.body.includes(marker));
+            async function hasPass(gameNumber, user) {
+              const marker = '<!-- ISSUES-GAME-PASS game=' + gameNumber + ' user=' + user + ' -->';
+              return (await comments(gameIssues[gameNumber])).some(c => c.body.includes(marker));
             }
 
             const answers = {
@@ -49,7 +54,7 @@ jobs:
               3: process.env.GAME3_ANSWER
             };
 
-            if (!answers[issue.number]) {
+            if (!answers[game]) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner, repo: context.repo.repo,
                 issue_number: issue.number,
@@ -58,7 +63,7 @@ jobs:
               return;
             }
 
-            if (issue.number === 2 && !(await hasPass(1, author))) {
+            if (game === 2 && !(await hasPass(1, author))) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner, repo: context.repo.repo,
                 issue_number: issue.number,
@@ -67,7 +72,7 @@ jobs:
               return;
             }
 
-            if (issue.number === 3 && !(await hasPass(2, author))) {
+            if (game === 3 && !(await hasPass(2, author))) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner, repo: context.repo.repo,
                 issue_number: issue.number,
@@ -78,7 +83,7 @@ jobs:
 
             const supplied = body.slice(8).split(/\r?\n/)[0].trim().toLowerCase();
 
-            if (issue.number === 3) {
+            if (game === 3) {
               const commitLine = body.split(/\r?\n/).find(x => /^commit\s*:/i.test(x));
               if (!commitLine) {
                 await github.rest.issues.createComment({
@@ -113,7 +118,7 @@ jobs:
               }
             }
 
-            const expected = answers[issue.number].trim().toLowerCase();
+            const expected = answers[game].trim().toLowerCase();
 
             if (supplied !== expected) {
               await github.rest.issues.createComment({
@@ -124,14 +129,14 @@ jobs:
               return;
             }
 
-            const marker = '<!-- ISSUES-GAME-PASS game=' + issue.number + ' user=' + author + ' -->';
-            const next = issue.number < 3
-              ? '\n\n🔓 Game ' + (issue.number + 1) + ' is now unlocked for you: https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/issues/' + (issue.number + 1)
+            const marker = '<!-- ISSUES-GAME-PASS game=' + game + ' user=' + author + ' -->';
+            const next = game < 3
+              ? '\n\n🔓 Game ' + (game + 1) + ' is now unlocked for you: https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/issues/' + gameIssues[game + 1]
               : '\n\n🏆 Event complete! Your final contribution has been recorded for organizer review.';
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue.number,
-              body: '✅ Correct, @' + author + '! Game ' + issue.number + ' is complete.\n\n' + marker + next
+              body: '✅ Correct, @' + author + '! Game ' + game + ' is complete.\n\n' + marker + next
             });

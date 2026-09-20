@@ -1,9 +1,0 @@
-# Final Clue
-
-I am three letters long.
-
-I am used every time developers save a snapshot of changes in Git.
-
-I am also the name of the tool that tracks those changes.
-
-What am I?

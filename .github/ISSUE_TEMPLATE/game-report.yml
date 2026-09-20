@@ -1,0 +1,16 @@
+name: Game Answer
+description: Submit an answer for the current game
+title: "[ANSWER] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use the game's official issue for your answer. Do not create a separate issue unless an organizer asks you to.
+  - type: input
+    id: answer
+    attributes:
+      label: Answer
+      description: Enter the answer exactly as instructed in the game.
+      placeholder: Your answer
+    validations:
+      required: true
